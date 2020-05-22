@@ -4,13 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"os"
+
+	"github.com/ravisantoshgudimetla/cluster-installer/pkg/goinstaller"
 )
-
-func downloadInstallerBinary() error {
-
-	return nil
-
-}
 
 func main() {
 	// Download the installer binary from mirror.openshift.com. URL to download
@@ -28,7 +24,7 @@ func main() {
 	// Run the installer again. This should complete the setup
 	// initFlags()
 	flag.Parse()
-	err := downloadInstallerBinary()
+	err := goinstaller.RunInstaller()
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
