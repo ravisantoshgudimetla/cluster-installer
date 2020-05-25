@@ -20,4 +20,3 @@ spec:
         - cidr: 10.132.0.0/14
           hostPrefix: 23
 status: {}
-

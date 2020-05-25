@@ -1,6 +1,8 @@
 // Code generated for package assets by go-bindata DO NOT EDIT. (@generated)
 // sources:
 // generated/cluster-network-03-config.yaml
+// generated/install-config-aws.yaml
+// generated/install-config-azure.yaml
 package assets
 
 import (
@@ -75,7 +77,6 @@ spec:
         - cidr: 10.132.0.0/14
           hostPrefix: 23
 status: {}
-
 `)
 
 func generatedClusterNetwork03ConfigYamlBytes() ([]byte, error) {
@@ -89,6 +90,106 @@ func generatedClusterNetwork03ConfigYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "generated/cluster-network-03-config.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _generatedInstallConfigAwsYaml = []byte(`apiVersion: v1
+baseDomain: devcluster.openshift.com
+compute:
+- architecture: amd64
+  hyperthreading: Enabled
+  name: worker
+  platform: {}
+  replicas: 3
+controlPlane:
+  architecture: amd64
+  hyperthreading: Enabled
+  name: master
+  platform: {}
+  replicas: 3
+metadata:
+  creationTimestamp: null
+  name: <name>
+networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  machineNetwork:
+  - cidr: 10.0.0.0/16
+  networkType: OVNKubernetes
+  serviceNetwork:
+  - 172.30.0.0/16
+platform:
+  aws:
+    region: <region>
+publish: External
+pullSecret: '<pullSecret>'
+sshKey: |
+  <sshKey>`)
+
+func generatedInstallConfigAwsYamlBytes() ([]byte, error) {
+	return _generatedInstallConfigAwsYaml, nil
+}
+
+func generatedInstallConfigAwsYaml() (*asset, error) {
+	bytes, err := generatedInstallConfigAwsYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "generated/install-config-aws.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _generatedInstallConfigAzureYaml = []byte(`apiVersion: v1
+baseDomain: winc.azure.devcluster.openshift.com
+compute:
+- architecture: amd64
+  hyperthreading: Enabled
+  name: worker
+  platform: {}
+  replicas: 3
+controlPlane:
+  architecture: amd64
+  hyperthreading: Enabled
+  name: master
+  platform: {}
+  replicas: 3
+metadata:
+  creationTimestamp: null
+  name: <name>
+networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  machineNetwork:
+  - cidr: 10.0.0.0/16
+  networkType: OVNKubernetes
+  serviceNetwork:
+  - 172.30.0.0/16
+platform:
+  azure:
+    baseDomainResourceGroupName: os4-common
+    region: <region>
+publish: External
+pullSecret: '<pullSecret>'
+sshKey: |
+  <sshKey>
+`)
+
+func generatedInstallConfigAzureYamlBytes() ([]byte, error) {
+	return _generatedInstallConfigAzureYaml, nil
+}
+
+func generatedInstallConfigAzureYaml() (*asset, error) {
+	bytes, err := generatedInstallConfigAzureYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "generated/install-config-azure.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -146,6 +247,8 @@ func AssetNames() []string {
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
 	"generated/cluster-network-03-config.yaml": generatedClusterNetwork03ConfigYaml,
+	"generated/install-config-aws.yaml":        generatedInstallConfigAwsYaml,
+	"generated/install-config-azure.yaml":      generatedInstallConfigAzureYaml,
 }
 
 // AssetDir returns the file names below a certain
@@ -191,6 +294,8 @@ type bintree struct {
 var _bintree = &bintree{nil, map[string]*bintree{
 	"generated": &bintree{nil, map[string]*bintree{
 		"cluster-network-03-config.yaml": &bintree{generatedClusterNetwork03ConfigYaml, map[string]*bintree{}},
+		"install-config-aws.yaml":        &bintree{generatedInstallConfigAwsYaml, map[string]*bintree{}},
+		"install-config-azure.yaml":      &bintree{generatedInstallConfigAzureYaml, map[string]*bintree{}},
 	}},
 }}
 
