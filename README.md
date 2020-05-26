@@ -31,7 +31,7 @@ Usage of ./oci:
   -region string
         specify the region to use, defaults to us-east-2 for aws (default "us-east-2")
   -skip-download
-        path to pull secret, be careful
+        skips the download of the openshift install file
   -version
         version (default true)
 ```
