@@ -1,5 +1,10 @@
 # cluster-installer
-Cluster installer for OpenShift
+Cluster installer for OpenShift. It downloads the latest installer from:
+```
+http://mirror.openshift.com/pub/openshift-v4/clients/ocp-dev-preview/latest/openshift-install-linux.tar.gz
+```
+
+You can also skip the download if you already happen to have a binary
 
 ## Why another wrapper for installer
 To just expose the minimal config needed for the OVNKubernetes network variant to work. If some wants to modify the 
