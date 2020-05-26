@@ -35,3 +35,10 @@ Usage of ./oci:
   -version
         version (default true)
 ```
+
+## How to update the cluster config or network config
+If someone wants to update network config or cluster network. They should update files [here](https://github.com/ravisantoshgudimetla/cluster-installer/tree/master/generated) 
+and run
+``` shell
+make update-bindata
+```
