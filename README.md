@@ -10,8 +10,8 @@ You can also skip the download if you already happen to have a binary
 To just expose the minimal config needed for the OVNKubernetes network variant to work. If some wants to modify the 
 config, they should update the bindata.
 
-## Why go
-I initially started out in python but I wanted types so I was left with go or Rust. I'll use Rust perhaps for my
+## Why Go
+I initially started out in python but I wanted types so I was left with Go or Rust. I'll use Rust perhaps for my
 next project.
 
 ## How to run
