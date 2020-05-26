@@ -18,7 +18,7 @@ func main() {
 		"specify the name of cluster to be created, defaults to my-dev-cluster")
 	flag.StringVar(&publicKeyPath, "key", "", "path to public key to be used, defaults to empty string be careful")
 	flag.StringVar(&pullSecretPath, "pull-secret", "", "path to pull secret, be careful")
-	flag.BoolVar(&skipDownload, "skip-download", false, "path to pull secret, be careful")
+	flag.BoolVar(&skipDownload, "skip-download", false, "skips the download of the openshift install file")
 	flag.StringVar(&installerPath, "installer-path", "/tmp", "installation directory")
 	flag.BoolVar(&version, "version", true, "version")
 	flag.Parse()
