@@ -1,13 +1,17 @@
 package goinstaller
 
 import (
+	"archive/tar"
 	"bytes"
+	"compress/gzip"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"sync"
 
@@ -25,7 +29,8 @@ type installerOptions struct {
 }
 
 func NewInstallerOptions(platform, region, name, pullSecretPath, publicKeyPath,
-	installerPath string) *installerOptions {
+	installerPath string, skipDownload bool) *installerOptions {
+	//func NewInstallerOptions() *installerOptions {
 	return &installerOptions{
 		platform:       platform,
 		region:         region,
@@ -33,7 +38,9 @@ func NewInstallerOptions(platform, region, name, pullSecretPath, publicKeyPath,
 		pullSecretPath: pullSecretPath,
 		publicKeyPath:  publicKeyPath,
 		installerPath:  installerPath,
+		skipDownload:   skipDownload,
 	}
+	//	return &installerOptions{installerPath: "/tmp"}
 }
 
 // Validate validates the code
@@ -42,30 +49,131 @@ func (i *installerOptions) Validate() error {
 }
 
 func (i *installerOptions) RunInstaller() error {
-	// Create the Installer directory. If skipDownload is set, we'll skip the download of installer.
-	if _, err := os.Stat("/home/ravig/Downloads/openshift-install-linux"); os.IsNotExist(err) {
-		// File doesn't exist, so download again.
+	// If we want to skip download, don't download the installer
+	if !i.skipDownload {
+		if err := i.downloadInstallerBinary(); err != nil {
+			return err
+		}
 	}
-	installDirectory := i.installerPath + "/" + i.platform
+
+	installDirectory := i.installerPath + "/openshift-install-linux/" + i.platform
 	if err := os.MkdirAll(installDirectory, 0744); err != nil {
 		return err
 	}
+	log.Printf("Successfully created install directory at %s", installDirectory)
 	if err := i.writeInstallConfig(installDirectory); err != nil {
 		return err
 	}
+	log.Printf("Successfully created install config at %s", installDirectory)
 	// Generate manifests
 	if err := i.writeInstallManifests(installDirectory); err != nil {
 		return err
 	}
 	manifestsDirectory := installDirectory + "/" + "manifests/"
+	log.Printf("Successfully created install manifest at %s", manifestsDirectory)
 	if err := writeClusterNetworkFile(manifestsDirectory); err != nil {
 		return err
 	}
-	// Installer code is working, don't run it for now
-	// if err := i.runInstaller(installDirectory); err != nil {
-	// 	return err
-	// }
-	return downloadInstallerBinary()
+	log.Printf("Successfully created cluster network file at %s", manifestsDirectory)
+	if err := i.runInstaller(installDirectory); err != nil {
+		return err
+	}
+	log.Print("Successfully ran installer")
+	return nil
+}
+
+func (i *installerOptions) downloadInstallerBinary() error {
+	resp, err := http.Get("http://mirror.openshift.com/pub/openshift-v4/clients/ocp-dev-preview/latest/openshift-install-linux.tar.gz")
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	file, err := os.Create(i.installerPath + "/openshift-install-linux.tar.gz")
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = io.Copy(file, resp.Body)
+
+	downloadFile, err := os.Open(i.installerPath + "/openshift-install-linux.tar.gz")
+	if err != nil {
+		return err
+	}
+	destString := i.installerPath + "/" + "openshift-install-linux"
+	if err := os.Mkdir(destString, 0744); err != nil {
+		return err
+	}
+	if err := untar(destString, downloadFile); err != nil {
+		return err
+	}
+	return err
+
+}
+
+func untar(dst string, r io.Reader) error {
+	gzr, err := gzip.NewReader(r)
+	if err != nil {
+		return err
+	}
+	defer gzr.Close()
+
+	tr := tar.NewReader(gzr)
+
+	for {
+		header, err := tr.Next()
+
+		switch {
+
+		// if no more files are found return
+		case err == io.EOF:
+			return nil
+
+		// return any other error
+		case err != nil:
+			return err
+
+		// if the header is nil, just skip it (not sure how this happens)
+		case header == nil:
+			continue
+		}
+
+		// the target location where the dir/file should be created
+		target := filepath.Join(dst, header.Name)
+
+		// the following switch could also be done using fi.Mode(), not sure if there
+		// a benefit of using one vs. the other.
+		// fi := header.FileInfo()
+
+		// check the file type
+		switch header.Typeflag {
+
+		// if its a dir and it doesn't exist create it
+		case tar.TypeDir:
+			if _, err := os.Stat(target); err != nil {
+				if err := os.MkdirAll(target, 0755); err != nil {
+					return err
+				}
+			}
+
+		// if it's a file create it
+		case tar.TypeReg:
+			f, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode))
+			if err != nil {
+				return err
+			}
+
+			// copy over contents
+			if _, err := io.Copy(f, tr); err != nil {
+				return err
+			}
+
+			// manually close here after each file operation; defering would cause each file close
+			// to wait until all operations have completed.
+			f.Close()
+		}
+	}
 }
 
 // CapturingPassThroughWriter is a writer that remembers
@@ -96,7 +204,7 @@ func (w *CapturingPassThroughWriter) Bytes() []byte {
 // Source code copied from: https://blog.kowalczyk.info/article/wOYk/advanced-command-execution-in-go-with-osexec.html
 func (i *installerOptions) runInstaller(installDirectory string) error {
 	var errStdout, errStderr error
-	cmd := exec.Command(i.installerPath+"/"+"openshift-install", "create", "cluster", "--log-level=debug",
+	cmd := exec.Command(i.installerPath+"/openshift-install-linux/"+"openshift-install", "create", "cluster", "--log-level=debug",
 		"--dir="+installDirectory)
 	stdoutIn, _ := cmd.StdoutPipe()
 	stderrIn, _ := cmd.StderrPipe()
@@ -131,7 +239,8 @@ func (i *installerOptions) runInstaller(installDirectory string) error {
 }
 
 func (i *installerOptions) writeInstallManifests(installDirectory string) error {
-	cmd := exec.Command(i.installerPath+"/"+"openshift-install", "create", "manifests", "--dir="+installDirectory)
+	cmd := exec.Command(i.installerPath+"/openshift-install-linux/"+"openshift-install", "create", "manifests",
+		"--dir="+installDirectory)
 	var out bytes.Buffer
 	cmd.Stdout = os.Stdout
 	err := cmd.Run()
@@ -180,9 +289,4 @@ func writeClusterNetworkFile(manifestsDirectory string) error {
 		return err
 	}
 	return nil
-}
-
-func downloadInstallerBinary() error {
-	return nil
-
 }
