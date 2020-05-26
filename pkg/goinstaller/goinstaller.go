@@ -30,7 +30,6 @@ type installerOptions struct {
 
 func NewInstallerOptions(platform, region, name, pullSecretPath, publicKeyPath,
 	installerPath string, skipDownload bool) *installerOptions {
-	//func NewInstallerOptions() *installerOptions {
 	return &installerOptions{
 		platform:       platform,
 		region:         region,
@@ -40,7 +39,6 @@ func NewInstallerOptions(platform, region, name, pullSecretPath, publicKeyPath,
 		installerPath:  installerPath,
 		skipDownload:   skipDownload,
 	}
-	//	return &installerOptions{installerPath: "/tmp"}
 }
 
 // Validate validates the code
@@ -51,11 +49,11 @@ func (i *installerOptions) Validate() error {
 func (i *installerOptions) RunInstaller() error {
 	// If we want to skip download, don't download the installer
 	if !i.skipDownload {
+		log.Printf("Downloading the installer at path at %s", i.installerPath)
 		if err := i.downloadInstallerBinary(); err != nil {
 			return err
 		}
 	}
-
 	installDirectory := i.installerPath + "/openshift-install-linux/" + i.platform
 	if err := os.MkdirAll(installDirectory, 0744); err != nil {
 		return err
