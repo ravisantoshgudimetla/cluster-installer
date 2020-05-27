@@ -20,7 +20,7 @@ func main() {
 	flag.StringVar(&pullSecretPath, "pull-secret", "", "path to pull secret, be careful")
 	flag.BoolVar(&skipDownload, "skip-download", false, "skips the download of the openshift install file")
 	flag.StringVar(&installerPath, "installer-path", "/tmp", "installation directory")
-	flag.BoolVar(&version, "version", true, "version")
+	flag.BoolVar(&version, "version", false, "version")
 	flag.Parse()
 	if version {
 		fmt.Printf("version: %s\n", getVersion())
