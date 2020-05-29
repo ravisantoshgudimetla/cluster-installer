@@ -28,7 +28,6 @@ func main() {
 	}
 	iOpts := goinstaller.NewInstallerOptions(platform, region, name, pullSecretPath, publicKeyPath, installerPath,
 		skipDownload)
-	//iOpts := goinstaller.NewInstallerOptions()
 	if err := iOpts.Validate(); err != nil {
 		log.Fatalf("error validating installer options: %v", err)
 	}
