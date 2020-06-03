@@ -16,29 +16,29 @@ next project.
 
 ## How to run
 ```go
- ./oci -installer-path /tmp/new_installer -key <use-openshift-dev> -name my-cool-cluster -platform azure -region centralus -pull-secret pull-secret 
+./oci create --installer-path <installer_path> --key <ssh_public_key> --name my-dev-cluster --platform aws --region us-east-2 --pull-secret <pull_secret_path>
 ```
 
 Options
 ```go
 ➜  cluster-installer git:(master) ✗ ./oci --help  
-Usage of ./oci:
-  -installer-path string
-        installation directory (default "/tmp")
-  -key string
-        path to public key to be used, defaults to empty string be careful
-  -name string
-        specify the name of cluster to be created, defaults to my-dev-cluster (default "my-dev-cluster")
-  -platform string
-        specify the platform to use, defaults to aws (default "aws")
-  -pull-secret string
-        path to pull secret, be careful
-  -region string
-        specify the region to use, defaults to us-east-2 for aws (default "us-east-2")
-  -skip-download
-        skips the download of the openshift install file
-  -version
-        version (default true)
+./oci --help
+downloads and runs the OpenShift installer binary to spin up OpenShift cluster
+
+Usage:
+  oci [command]
+
+Available Commands:
+  create      Creates OpenShift cluster
+  help        Help about any command
+  version     Specifies the version of oci
+
+Flags:
+  -h, --help                    help for oci
+      --installer-path string   installation directory (default "/tmp")
+      --skip-download           skips the download of the openshift install file
+
+Use "oci [command] --help" for more information about a command.
 ```
 
 ## How to update the cluster config or network config
