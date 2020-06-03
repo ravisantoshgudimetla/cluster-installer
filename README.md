@@ -21,8 +21,7 @@ next project.
 
 Options
 ```go
-➜  cluster-installer git:(master) ✗ ./oci --help  
-./oci --help
+➜  cluster-installer git:(master) ✗ ./oci --help
 downloads and runs the OpenShift installer binary to spin up OpenShift cluster
 
 Usage:
