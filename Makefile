@@ -12,7 +12,3 @@ build:
 .PHONY: update-bindata
 update-bindata: 
 	hack/update-generated-bindata.sh
-
-
-
-
