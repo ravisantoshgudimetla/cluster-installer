@@ -6,4 +6,7 @@ type windowsMachine struct {
 	imageName string
 }
 
-func NewMachine
+// NewMachine downloads the new container image for WMCO
+func NewMachine() {
+
+}
