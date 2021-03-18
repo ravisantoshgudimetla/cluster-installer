@@ -14,7 +14,8 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
-
+    "runtime"
+    
 	"github.com/ravisantoshgudimetla/cluster-installer/pkg/assets"
 )
 
@@ -54,7 +55,13 @@ func (i *installerOptions) RunInstaller() error {
 			return err
 		}
 	}
-	installDirectory := i.installerPath + "/openshift-install-linux/" + i.platform
+    installType := ""
+    if runtime.GOOS ==  "darwin" {
+        installType = "/openshift-install-mac/"
+    } else if runtime.GOOS == "linux" {
+        installType = "/openshift-install-linux/"
+    }
+	installDirectory := i.installerPath + installType + i.platform
 	if err := os.MkdirAll(installDirectory, 0744); err != nil {
 		return err
 	}
@@ -81,7 +88,14 @@ func (i *installerOptions) RunInstaller() error {
 }
 
 func (i *installerOptions) downloadInstallerBinary() error {
-	resp, err := http.Get("http://mirror.openshift.com/pub/openshift-v4/clients/ocp-dev-preview/latest/openshift-install-linux.tar.gz")
+    downloader := ""
+    if runtime.GOOS == "darwin" {
+        downloader = "mac"
+    } else if runtime.GOOS == "linux" {
+        downloader = "linux"
+    }
+	resp, err :=
+    http.Get("http://mirror.openshift.com/pub/openshift-v4/clients/ocp-dev-preview/latest/openshift-install-"+downloader+".tar.gz")
 	if err != nil {
 		return err
 	}
