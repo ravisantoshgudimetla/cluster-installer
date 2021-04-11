@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"runtime"
 	"sync"
 
 	"github.com/ravisantoshgudimetla/cluster-installer/pkg/goinstaller"
@@ -41,8 +42,14 @@ func newDeleteCmd() *cobra.Command {
 
 func deleteInstaller(installerPath, platform string) error {
 	var errStdout, errStderr error
-	installDirectory := installerPath + "/openshift-install-linux/" + platform
-	cmd := exec.Command(installerPath+"/openshift-install-linux/"+"openshift-install", "destroy", "cluster", "--log-level=debug",
+	var osType string
+	if runtime.GOOS == "darwin" {
+		osType = "mac"
+	} else if runtime.GOOS == "linux" {
+		osType = "linux"
+	}
+	installDirectory := installerPath + "/openshift-install-"+ osType + "/platform"
+	cmd := exec.Command(installerPath+"/openshift-install-"+osType+"/openshift-install", "destroy", "cluster", "--log-level=debug",
 		"--dir="+installDirectory)
 	stdoutIn, _ := cmd.StdoutPipe()
 	stderrIn, _ := cmd.StderrPipe()

@@ -100,8 +100,7 @@ func (i *installerOptions) downloadInstallerBinary() error {
 		return err
 	}
 	defer resp.Body.Close()
-
-	file, err := os.Create(i.installerPath + "/openshift-install-linux.tar.gz")
+	file, err := os.Create(i.installerPath + "/openshift-install-"+downloader+".tar.gz")
 	if err != nil {
 		return err
 	}
@@ -109,11 +108,11 @@ func (i *installerOptions) downloadInstallerBinary() error {
 
 	_, err = io.Copy(file, resp.Body)
 
-	downloadFile, err := os.Open(i.installerPath + "/openshift-install-linux.tar.gz")
+	downloadFile, err := os.Open(i.installerPath + "/openshift-install-"+downloader+".tar.gz")
 	if err != nil {
 		return err
 	}
-	destString := i.installerPath + "/" + "openshift-install-linux"
+	destString := i.installerPath + "/" + "openshift-install-"+downloader
 	if err := os.Mkdir(destString, 0744); err != nil {
 		return err
 	}
@@ -212,11 +211,17 @@ func (w *CapturingPassThroughWriter) Bytes() []byte {
 	return w.buf.Bytes()
 }
 
-// runInstaller runs the openshif installer and captures the output.
+// runInstaller runs the openshift installer and captures the output.
 // Source code copied from: https://blog.kowalczyk.info/article/wOYk/advanced-command-execution-in-go-with-osexec.html
 func (i *installerOptions) runInstaller(installDirectory string) error {
 	var errStdout, errStderr error
-	cmd := exec.Command(i.installerPath+"/openshift-install-linux/"+"openshift-install", "create", "cluster", "--log-level=debug",
+	var downloader string
+	if runtime.GOOS == "darwin" {
+		downloader = "mac"
+	} else if runtime.GOOS == "linux" {
+		downloader = "linux"
+	}
+	cmd := exec.Command(i.installerPath+"/openshift-install-" + downloader+ "/openshift-install", "create", "cluster", "--log-level=debug",
 		"--dir="+installDirectory)
 	stdoutIn, _ := cmd.StdoutPipe()
 	stderrIn, _ := cmd.StderrPipe()
@@ -251,7 +256,13 @@ func (i *installerOptions) runInstaller(installDirectory string) error {
 }
 
 func (i *installerOptions) writeInstallManifests(installDirectory string) error {
-	cmd := exec.Command(i.installerPath+"/openshift-install-linux/"+"openshift-install", "create", "manifests",
+	osType := ""
+	if runtime.GOOS == "darwin" {
+		osType = "mac"
+	} else if runtime.GOOS == "linux" {
+		osType = "linux"
+	}
+	cmd := exec.Command(i.installerPath+"/openshift-install-"+osType+"/openshift-install", "create", "manifests",
 		"--dir="+installDirectory)
 	var out bytes.Buffer
 	cmd.Stdout = os.Stdout
