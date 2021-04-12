@@ -48,7 +48,7 @@ func deleteInstaller(installerPath, platform string) error {
 	} else if runtime.GOOS == "linux" {
 		osType = "linux"
 	}
-	installDirectory := installerPath + "/openshift-install-"+ osType + "/platform"
+	installDirectory := installerPath + "/openshift-install-"+ osType + "/"+ platform
 	cmd := exec.Command(installerPath+"/openshift-install-"+osType+"/openshift-install", "destroy", "cluster", "--log-level=debug",
 		"--dir="+installDirectory)
 	stdoutIn, _ := cmd.StdoutPipe()
