@@ -30,7 +30,7 @@ func newDeleteCmd() *cobra.Command {
 		Long:             "deletes an OpenShift cluster",
 		TraverseChildren: true,
 		RunE: func(_ *cobra.Command, args []string) error {
-			return deleteInstaller(ociInfo.installerPath, deleteInfo.platform)
+			return deleteInstaller(ociInfo.installerPath, deleteInfo.platform, deleteInfo.deleteInstaller)
 		},
 	}
 	deleteCmd.PersistentFlags().BoolVar(&deleteInfo.deleteInstaller, "delete-installer", false,
@@ -40,7 +40,7 @@ func newDeleteCmd() *cobra.Command {
 	return deleteCmd
 }
 
-func deleteInstaller(installerPath, platform string) error {
+func deleteInstaller(installerPath, platform string, deleteInstaller bool) error {
 	var errStdout, errStderr error
 	var osType string
 	if runtime.GOOS == "darwin" {
@@ -80,5 +80,15 @@ func deleteInstaller(installerPath, platform string) error {
 	}
 	outStr, errStr := string(stdout.Bytes()), string(stderr.Bytes())
 	fmt.Printf("\nout:\n%s\nerr:\n%s\n", outStr, errStr)
+	if deleteInstaller {
+		// delete the directory containing
+		if err := os.RemoveAll(installerPath + "/openshift-install-"+osType); err != nil {
+			return fmt.Errorf("error deleting file %v", err)
+		}
+		// delete the installer tar file we downloaded earlier
+		if err := os.RemoveAll(installerPath + "/openshift-install-"+osType+".tar.gz"); err != nil {
+			return fmt.Errorf("error deleting installer tar file %v", err)
+		}
+	}
 	return nil
 }
