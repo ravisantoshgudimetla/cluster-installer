@@ -11,7 +11,7 @@ To just expose the minimal config needed for the OVNKubernetes network variant t
 config, they should update the bindata.
 
 ## Why Go
-I initially started out in python but I wanted types so I was left with Go or Rust. I want to use go to generate a single binary for the usage
+I initially started out in python but I wanted types so I was left with Go or Rust. I want to use `go`  to generate a single binary for the usage.
 
 ## How to run
 ```go
